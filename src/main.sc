@@ -4,9 +4,8 @@ require: slotfilling/slotFilling.sc
 theme: /
 
     state: Start
-        q!: $regex</start>
-        script:
-            log({{ $session }})
+        q!: $regex<1>
+        a: {{$request.userFrom.firstName}}
         if: $client.name
             random:
                 a: {{ $client.name }}, здравствуйте! Артур из Just Tour на связи. Рад снова видеть вас в чате!
