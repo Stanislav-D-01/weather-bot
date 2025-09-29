@@ -5,7 +5,8 @@ theme: /
 
     state: Start
         q!: $regex<1>
-        a: {{$request.userFrom.firstName}}
+        script:
+            $client.name = $request.userFrom.firstName
         if: $client.name
             random:
                 a: {{ $client.name }}, здравствуйте! Артур из Just Tour на связи. Рад снова видеть вас в чате!
