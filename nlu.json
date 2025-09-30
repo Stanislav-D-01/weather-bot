@@ -22,23 +22,7 @@
       "answerValidationThreshold" : 0.8
     }
   },
-  "intents" : [ {
-    "path" : "/City",
-    "enabled" : true,
-    "shared" : false,
-    "phrases" : [ {
-      "text" : "Москва"
-    }, {
-      "text" : "Саратов"
-    }, {
-      "text" : "Энгельс"
-    } ],
-    "classificationRules" : {
-      "refs" : [ ]
-    },
-    "patterns" : [ ],
-    "priority" : 0
-  } ],
+  "intents" : [ ],
   "entities" : [ ],
   "enabledSystemEntities" : [ "duckling.number", "duckling.time", "duckling.duration", "duckling.phone-number", "duckling.email", "duckling.url" ],
   "spellerDictionary" : [ ],

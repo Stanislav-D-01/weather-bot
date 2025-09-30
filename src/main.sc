@@ -19,12 +19,13 @@ theme: /
         go!: /GetCity
 
     state: GetCity
+        q!: $regex<2>
         random:
             a: Укажите, пожалуйста, название города, для которого хотите узнать прогноз погоды.
             a: Скажите, пожалуйста, для какого города вы хотите получить прогноз?
             a: Прогноз для какого города хотите получить?
 
 
-    state: Match
-        event!: noMatch
-        a: {{$context.intent.answer}}
+    state: LocalCatchAll
+            event: noMatch
+            a: Это не похоже на ответ. Попробуйте еще раз.
