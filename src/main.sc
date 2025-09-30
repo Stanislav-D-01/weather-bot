@@ -25,7 +25,7 @@ theme: /
             a: Прогноз для какого города хотите получить?
             
         state: UserCity
-            intent!: /City
+            intent!: /сity
             a: fdsafsa
 
 

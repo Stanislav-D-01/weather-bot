@@ -23,7 +23,7 @@
     }
   },
   "intents" : [ {
-    "path" : "/City",
+    "path" : "/сity",
     "enabled" : true,
     "shared" : false,
     "phrases" : [ ],
