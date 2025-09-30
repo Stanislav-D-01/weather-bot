@@ -1,4 +1,4 @@
-
+require: slotfilling/slotFilling.sc
 require: city/city.sc
 
   module = sys.zb-common
@@ -30,5 +30,5 @@ theme: /
 
 
     state: LocalCatchAll
-            event!: noMatch
+            event:: noMatch
             a: Это не похоже на ответ. Попробуйте еще раз.
