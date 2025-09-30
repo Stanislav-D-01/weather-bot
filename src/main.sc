@@ -1,4 +1,4 @@
-require: slotfilling/slotFilling.sc
+
 require: city/city.sc
 
   module = sys.zb-common
