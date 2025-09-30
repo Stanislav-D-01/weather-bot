@@ -5,7 +5,7 @@ require: city/city.sc
 theme: /
 
     state: Start
-        q!: $regex</start>
+        q!: $regex<привет>
         script:
             $client.name = $request.userFrom.firstName
         if: $client.name
