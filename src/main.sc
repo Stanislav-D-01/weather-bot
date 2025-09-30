@@ -23,13 +23,6 @@ theme: /
             a: Скажите, пожалуйста, для какого города вы хотите получить прогноз?
             a: Прогноз для какого города хотите получить?
 
-    state: Bye
-        intent!: /пока
-        a: Пока пока
-
-    state: NoMatch
-        event!: noMatch
-        a: Я не понял. Вы сказали: {{$request.query}}
 
     state: Match
         event!: match

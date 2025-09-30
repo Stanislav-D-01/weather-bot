@@ -23,28 +23,20 @@
     }
   },
   "intents" : [ {
-    "path" : "/пока",
+    "path" : "/City",
     "enabled" : true,
     "shared" : false,
     "phrases" : [ {
-      "text" : "пока"
-    } ],
-    "classificationRules" : {
-      "refs" : [ ]
-    },
-    "priority" : 0
-  }, {
-    "path" : "/привет",
-    "enabled" : true,
-    "shared" : false,
-    "phrases" : [ {
-      "text" : "привет"
+      "text" : "Москва"
+    }, {
+      "text" : "Саратов"
+    }, {
+      "text" : "Энгельс"
     } ],
     "classificationRules" : {
       "refs" : [ ]
     },
     "patterns" : [ ],
-    "slots" : [ ],
     "priority" : 0
   } ],
   "entities" : [ ],
