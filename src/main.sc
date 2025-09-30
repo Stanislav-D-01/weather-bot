@@ -30,5 +30,5 @@ theme: /
 
 
     state: LocalCatchAll
-            event: noMatch
+            event!: noMatch
             a: Это не похоже на ответ. Попробуйте еще раз.
