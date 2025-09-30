@@ -29,6 +29,10 @@ theme: /
             a: fdsafsa
 
 
-    state: LocalCatchAll
-            event:: noMatch
-            a: Это не похоже на ответ. Попробуйте еще раз.
+    state: NoMatch
+        event!: noMatch
+        a: Я не понял. Вы сказали: {{$request.query}}
+
+    state: Match
+        event!: match
+        a: {{$context.intent.answer}}
