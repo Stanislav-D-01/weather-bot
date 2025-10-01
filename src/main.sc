@@ -21,6 +21,7 @@ theme: /
         go!: /GetCity
 
     state: GetCity
+        intent!: /weather_forecast    
         random:
             a: Укажите, пожалуйста, название города, для которого хотите узнать прогноз погоды.
             a: Скажите, пожалуйста, для какого города вы хотите получить прогноз?
@@ -45,8 +46,22 @@ theme: /
               
             else:
                 a: Простите! Кажется, я пока не умею узнавать прогноз погоды с такими параметрами, но постараюсь поскорее научиться.
-             
+                go!: /SomethingElse
             
-    state: Match
-        event!: match
-        a: {{$context.intent.answer}}
+    state: SomethingElse
+        random:
+            a: Хотите спросить что-то еще?
+            a: Могу ли я помочь чем-то еще?
+            a: Подскажите, у вас остались еще вопросы?
+        script:
+            $response.replies = $response.replies || [];
+            $response.replies.push({
+                "type": "buttons",
+                "buttons": [
+                    {"text": "Узнать прогноз погоды"}
+                ]
+            });
+        
+    # state: Match
+    #     event!: match
+    #     a: {{$context.intent.answer}}

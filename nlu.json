@@ -47,6 +47,22 @@
       "prompts" : [ ]
     } ],
     "priority" : 0
+  }, {
+    "path" : "/weather_forecast",
+    "enabled" : true,
+    "shared" : false,
+    "phrases" : [ {
+      "text" : "Узнать прогноз погоды"
+    }, {
+      "text" : "Хочу узнать погоду"
+    }, {
+      "text" : "какой прогноз"
+    } ],
+    "classificationRules" : {
+      "refs" : [ ]
+    },
+    "patterns" : [ ],
+    "priority" : 0
   } ],
   "entities" : [ ],
   "enabledSystemEntities" : [ "mystem.geo", "duckling.number", "duckling.time", "duckling.date", "duckling.duration", "duckling.phone-number", "duckling.email", "duckling.url" ],
