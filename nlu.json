@@ -26,7 +26,11 @@
     "path" : "/сity",
     "enabled" : true,
     "shared" : false,
-    "phrases" : [ ],
+    "phrases" : [ {
+      "text" : "@mystem.geo"
+    }, {
+      "text" : "@duckling.date"
+    } ],
     "classificationRules" : {
       "refs" : [ ]
     },
@@ -36,21 +40,10 @@
       "entity" : "mystem.geo",
       "required" : true,
       "prompts" : [ "Укажите, пожалуйста, название города, для которого хотите узнать прогноз погоды.", "Скажите, пожалуйста, для какого города вы хотите получить прогноз?", "Прогноз для какого города хотите получить?" ]
-    } ],
-    "priority" : 0
-  }, {
-    "path" : "/Date",
-    "enabled" : true,
-    "shared" : false,
-    "phrases" : [ ],
-    "classificationRules" : {
-      "refs" : [ ]
-    },
-    "patterns" : [ ],
-    "slots" : [ {
-      "name" : "date",
+    }, {
+      "name" : "duckling.date",
       "entity" : "duckling.date",
-      "required" : true,
+      "required" : false,
       "prompts" : [ ]
     } ],
     "priority" : 0

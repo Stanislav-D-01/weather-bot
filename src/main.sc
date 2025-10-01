@@ -28,11 +28,18 @@ theme: /
             intent!: /сity
             a: fdsafsa
 
-
-    state: NoMatch
-        event!: noMatch
-        a: Я не понял. Вы сказали: {{$request.query}}
-
+        state: CatchAll
+            event!: noMatch
+            script:
+                $session.stateCounterInARow ? $session.stateCounterInARow+1 : 0
+            if: ($session.stateCounterInARow < 3)
+                random:
+                    a: Извините, не совсем понял вас. Напишите, пожалуйста, название города, чтобы я смог узнать прогноз погоды для него.
+                    a: К сожалению, не понял вас. Укажите, пожалуйста, нужный вам город.
+            else:
+                a: Простите! Кажется, я пока не умею узнавать прогноз погоды с такими параметрами, но постараюсь поскорее научиться.
+        
+   
     state: Match
         event!: match
         a: {{$context.intent.answer}}
