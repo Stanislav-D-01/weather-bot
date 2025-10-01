@@ -2,6 +2,8 @@ require: slotfilling/slotFilling.sc
   module = sys.zb-common
 require: city/city.sc
   module = sys.zb-common
+require: functions.js
+
 theme: /
 
     state: Start
@@ -26,23 +28,25 @@ theme: /
             
         state: UserCity
             intent!: /сity
-            a: fdsafsa
+            a: Город
 
         state: CatchAll
             event!: noMatch
-            if: (!$session.stateCounterInARow) 
+            if: $context.session.lastState !== $context.currentState
                 script:
-                    $session.stateCounterInARow = 0;
-            elseif: ($session.stateCounterInARow && $session.stateCounterInARow < 3)    
+                    $session.stateCounterInARow = 1;
+            else:
                 script:
-                    $session.stateCounterInARow = $session.stateCounterInARow+1;
+                    $session.stateCounterInARow = $session.stateCounterInARow + 1;
+            if: ($session.stateCounterInARow && $session.stateCounterInARow < 3)    
                 random:
                     a: Извините, не совсем понял вас. Напишите, пожалуйста, название города, чтобы я смог узнать прогноз погоды для него.
                     a: К сожалению, не понял вас. Укажите, пожалуйста, нужный вам город.
+              
             else:
                 a: Простите! Кажется, я пока не умею узнавать прогноз погоды с такими параметрами, но постараюсь поскорее научиться.
-        
-   
+             
+            
     state: Match
         event!: match
         a: {{$context.intent.answer}}
