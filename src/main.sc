@@ -30,9 +30,12 @@ theme: /
 
         state: CatchAll
             event!: noMatch
-            script:
-                $session.stateCounterInARow ? $session.stateCounterInARow+1 : 0
-            if: ($session.stateCounterInARow < 3)
+            if: (!$session.stateCounterInARow) 
+                script:
+                    $session.stateCounterInARow = 0;
+            elseif: ($session.stateCounterInARow && $session.stateCounterInARow < 3)    
+                script:
+                    $session.stateCounterInARow = $session.stateCounterInARow+1;
                 random:
                     a: Извините, не совсем понял вас. Напишите, пожалуйста, название города, чтобы я смог узнать прогноз погоды для него.
                     a: К сожалению, не понял вас. Укажите, пожалуйста, нужный вам город.
