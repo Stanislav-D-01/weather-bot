@@ -4,6 +4,9 @@ require: city/city.sc
   module = sys.zb-common
 require: functions.js
 
+
+    
+
 theme: /
 
     state: Start
@@ -29,7 +32,11 @@ theme: /
             
         state: UserCity
             intent!: /сity
-            a: Город
+            script:
+                $session.city = $caila.inflect($parseTree._city, ["nomn"]);
+                $session.positions = getGeoPosition ($session.city) 
+                $session.weather = getWeather($session.positions.lat,$session.positions.long,'2025-10-08T00:00')
+            a: {{$session.weather}}
 
         state: CatchAll
             event!: noMatch
