@@ -4,13 +4,11 @@ require: city/city.sc
   module = sys.zb-common
 require: functions.js
 
-
-    
-
 theme: /
 
     state: Start
         q!: $regex</start>
+        intent!: /hi
         script:
             $client.name = $request.userFrom.firstName
         if: $client.name
@@ -23,23 +21,50 @@ theme: /
                 a: Приветствую вас! Я Артур, работаю виртуальным ассистентом в Just Tour, лучшем туристическом агентстве. Проинформирую вас о погоде в разных городах.
         go!: /GetCity
 
-    state: GetCity
-        intent!: /weather_forecast    
+    state: WeatherForecast
+        intent!: /weather_forecast
+        if: $parseTree._date && $parseTree._city
+            script:
+                $session.dateFlagWeek = checkWeekDate($request.query)
+                $session.date = $parseTree._date.value
+                $session.city = $caila.inflect($parseTree._city, ["nomn"])
+                $session.lat = getGeoPosition($session.city).lat
+                $session.lon = getGeoPosition($session.city).lon
+            go!: /CheckDate
+        elseif: $parseTree._date && !$parseTree._city
+            script:
+                 $session.date = $parseTree._date.value
+                 $session.dateFlagWeek = checkWeekDate($request.query)
+            go!: /GetCity
+        elseif: !$parseTree._date && $parseTree._city
+            script:
+                $session.city = $caila.inflect($parseTree._city, ["nomn"])
+                $session.lat = getGeoPosition($session.city).lat
+                $session.lon = getGeoPosition($session.city).lon
+            go!: /GetDate
+        else:
+            go!: /GetCity
+            
+    state: GetCity 
         random:
             a: Укажите, пожалуйста, название города, для которого хотите узнать прогноз погоды.
             a: Скажите, пожалуйста, для какого города вы хотите получить прогноз?
             a: Прогноз для какого города хотите получить?
+        timeout: /StopSession || interval = "1 minutes"
             
         state: UserCity
-            intent!: /сity
+            intent: /city
             script:
-                $session.city = $caila.inflect($parseTree._city, ["nomn"]);
-                $session.positions = getGeoPosition ($session.city) 
-                $session.weather = getWeather($session.positions.lat,$session.positions.long,'2025-10-08T00:00')
-            a: {{$session.weather}}
-
-        state: CatchAll
-            event!: noMatch
+                $session.date = $parseTree._date && $parseTree._date.value || null
+            if: $session.date
+                script:
+                    $session.dateFlagWeek = checkWeekDate($request.query)
+                go!: /CheckDate
+            else:
+                go!: /GetDate
+         
+        state: CatchAll noContext = true
+            event: noMatch
             if: $context.session.lastState !== $context.currentState
                 script:
                     $session.stateCounterInARow = 1;
@@ -50,10 +75,34 @@ theme: /
                 random:
                     a: Извините, не совсем понял вас. Напишите, пожалуйста, название города, чтобы я смог узнать прогноз погоды для него.
                     a: К сожалению, не понял вас. Укажите, пожалуйста, нужный вам город.
-              
             else:
                 a: Простите! Кажется, я пока не умею узнавать прогноз погоды с такими параметрами, но постараюсь поскорее научиться.
-                go!: /SomethingElse
+                go!: /SomethingElse    
+            timeout: /StopSession || interval = "1 minutes"
+    
+    state: GetDate
+        random:
+            a: На какую дату требуется прогноз?
+            a: Прогноз погоды на какую дату вам нужен?
+        timeout: /StopSession || interval = "1 minutes"
+        
+        state: UserDate
+            intent: /date
+            script:
+                $session.dateFlagWeek = checkWeekDate($request.query)
+                $session.date = $parseTree._date.value 
+            go!: /CheckDate
+    
+    state: CheckDate
+        if: checkDate($session.date).past
+            a: прошлое
+        elseif: checkDate($session.date).away
+            a: далеко
+        else:
+            a: норм
+        
+        timeout: /StopSession || interval = "1 minutes"
+    
             
     state: SomethingElse
         random:
@@ -68,7 +117,12 @@ theme: /
                     {"text": "Узнать прогноз погоды"}
                 ]
             });
+        timeout: /StopSession || interval = "1 minutes"
+            
+    state: StopSession
+        script:
+            $jsapi.stopSession();
         
-    # state: Match
-    #     event!: match
-    #     a: {{$context.intent.answer}}
+    state: Match
+        event!: match
+        a: {{$context.intent.answer}}

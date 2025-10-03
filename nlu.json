@@ -23,13 +23,23 @@
     }
   },
   "intents" : [ {
-    "path" : "/сity",
+    "path" : "/weather_forecast",
     "enabled" : true,
     "shared" : false,
     "phrases" : [ {
       "text" : "@mystem.geo"
     }, {
       "text" : "@duckling.date"
+    }, {
+      "text" : "какая погода"
+    }, {
+      "text" : "какой прогноз"
+    }, {
+      "text" : "прогноз"
+    }, {
+      "text" : "погода"
+    }, {
+      "text" : "расскажи про погоду в москве"
     } ],
     "classificationRules" : {
       "refs" : [ ]
@@ -41,27 +51,78 @@
       "required" : true,
       "prompts" : [ "Укажите, пожалуйста, название города, для которого хотите узнать прогноз погоды.", "Скажите, пожалуйста, для какого города вы хотите получить прогноз?", "Прогноз для какого города хотите получить?" ]
     }, {
-      "name" : "duckling.date",
+      "name" : "date",
       "entity" : "duckling.date",
       "required" : false,
       "prompts" : [ ]
     } ],
     "priority" : 0
   }, {
-    "path" : "/weather_forecast",
+    "path" : "/hi",
     "enabled" : true,
     "shared" : false,
     "phrases" : [ {
-      "text" : "Узнать прогноз погоды"
+      "text" : "привет"
     }, {
-      "text" : "Хочу узнать погоду"
+      "text" : "Добрый день"
     }, {
-      "text" : "какой прогноз"
+      "text" : "Здравствуйте"
+    }, {
+      "text" : "Приветствую"
+    }, {
+      "text" : "Доброе утро"
+    }, {
+      "text" : "Добрый вечер"
+    }, {
+      "text" : "Хэллоу"
+    }, {
+      "text" : "хай"
     } ],
     "classificationRules" : {
       "refs" : [ ]
     },
     "patterns" : [ ],
+    "priority" : 0
+  }, {
+    "path" : "/city",
+    "enabled" : true,
+    "shared" : false,
+    "phrases" : [ {
+      "text" : "@mystem.geo"
+    } ],
+    "classificationRules" : {
+      "refs" : [ ]
+    },
+    "patterns" : [ ],
+    "slots" : [ {
+      "name" : "city",
+      "entity" : "mystem.geo",
+      "required" : true,
+      "prompts" : [ ]
+    }, {
+      "name" : "date",
+      "entity" : "duckling.date",
+      "required" : false,
+      "prompts" : [ ]
+    } ],
+    "priority" : 0
+  }, {
+    "path" : "/date",
+    "enabled" : true,
+    "shared" : false,
+    "phrases" : [ {
+      "text" : "@duckling.date"
+    } ],
+    "classificationRules" : {
+      "refs" : [ ]
+    },
+    "patterns" : [ ],
+    "slots" : [ {
+      "name" : "date",
+      "entity" : "duckling.date",
+      "required" : true,
+      "prompts" : [ ]
+    } ],
     "priority" : 0
   } ],
   "entities" : [ ],
