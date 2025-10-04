@@ -175,7 +175,7 @@ theme: /
             $session.lon = getGeoPosition($session.city).lon;
             $temp.temperatureMax = getWeather ($session.lat, $session.lon, $session.date, $session.dateFinalWeek).maxT
             $temp.temperatureMin = getWeather ($session.lat, $session.lon, $session.date, $session.dateFinalWeek).minT
-        if: !getGeoPosition.err || !$temp.temperatureMax || !$temp.temperatureMin
+        if: getGeoPosition.err || !$temp.temperatureMax || !$temp.temperatureMin
             script:
                 $session.stateCounter = $session.stateCounter? $session.stateCounter : 0
             go!: ./Error
