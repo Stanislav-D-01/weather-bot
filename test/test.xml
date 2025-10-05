@@ -1,20 +1,40 @@
 <test>
-    <mockData>
-        <query>
-            https://geocoding-api.open-meteo.com/v1/search?name=${city}&amp;count=10&amp;language=ru&amp;format=json
-        </query>
-        <parameters>
-                <city>Москва</city>
-        </parameters>
-        <response>
-            {
-                "results": [
-                    {
-                        "latitude": 55.75222,
-                        "longitude": 37.61556
-                    }
-                ]
-            }
+   
+    <test-case id="Приветствие">
+        <q>привет</q>
+        <a state="/Start"/>
+        <a state="/GetCity"/>
+        <timeoutReply targetState="/StopSession"/>
+        <timeout/>
+    </test-case>
+    
+    <test-case id="/Start">
+        <q>/start</q>
+        <a state="/Start"/>
+        <a state="/GetCity"/>
+        <timeoutReply targetState="/StopSession"/>
+        <timeout/>
+        
+    </test-case> 
+    
+    
+    <test-case id="Назвал город">
+        <dateTime>2025-10-05 15:30:00\\</dateTime>
+        <mockData>
+            <query method="GET">https://geocoding-api.open-meteo.com/v1/search?name=${city}&amp;count=10&amp;language=ru&amp;format=json</query>
+            <parameters>
+                <city>москва</city>
+            </parameters>
+            <response>
+                {
+                    "results": [
+                        {
+                            "latitude": 55.75222,
+                            "longitude": 37.61556
+                        },
+                        {}
+                    ]
+                }
         </response>
     </mockData>
     
@@ -83,26 +103,6 @@
             }
         </response>
     </mockData>
-    <test-case id="Приветствие">
-        <q>привет</q>
-        <a state="/Start"/>
-        <a state="/GetCity"/>
-        <timeoutReply targetState="/StopSession"/>
-        <timeout/>
-    </test-case>
-    
-    <test-case id="/Start">
-        <q>/start</q>
-        <a state="/Start"/>
-        <a state="/GetCity"/>
-        <timeoutReply targetState="/StopSession"/>
-        <timeout/>
-        
-    </test-case> 
-    
-    
-    <test-case id="Назвал город">
-        <dateTime>2025-10-05 15:30:00</dateTime>
         <q>привет</q>
         <a state="/Start"/>
         <a state="/GetCity"/>
@@ -113,6 +113,7 @@
         <q>сегодня</q>
         <a state="/TellWeather"/>
         <a state="/SomethingElse"/>
+        <timeoutReply targetState="/StopSession"/>
     </test-case>
     
     
