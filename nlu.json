@@ -23,6 +23,60 @@
     }
   },
   "intents" : [ {
+    "path" : "/who_are_you",
+    "enabled" : true,
+    "shared" : false,
+    "phrases" : [ {
+      "text" : "кто ты"
+    }, {
+      "text" : "кто ты воин?"
+    }, {
+      "text" : "что ты"
+    }, {
+      "text" : "что это?"
+    }, {
+      "text" : "кто это?"
+    }, {
+      "text" : "кто это пишет"
+    }, {
+      "text" : "кто пишет"
+    }, {
+      "text" : "ты кто?"
+    }, {
+      "text" : "ты что?"
+    }, {
+      "text" : "ты робот?"
+    }, {
+      "text" : "ты человек?"
+    } ],
+    "classificationRules" : {
+      "refs" : [ ]
+    },
+    "patterns" : [ ],
+    "priority" : 0
+  }, {
+    "path" : "/what_can_you_do",
+    "enabled" : true,
+    "shared" : false,
+    "phrases" : [ {
+      "text" : "Что ты делаешь?"
+    }, {
+      "text" : "что ты умеешь?"
+    }, {
+      "text" : "Что расскажешь?"
+    }, {
+      "text" : "че делаешь?"
+    }, {
+      "text" : "че умеешь?"
+    }, {
+      "text" : "че ты пишешь?"
+    } ],
+    "classificationRules" : {
+      "refs" : [ ]
+    },
+    "patterns" : [ ],
+    "priority" : 0
+  }, {
     "path" : "/weather_forecast",
     "enabled" : true,
     "shared" : false,
@@ -41,11 +95,13 @@
     }, {
       "text" : "расскажи про погоду в москве"
     }, {
-      "text" : "Погода в Москве на следующей неделе"
+      "text" : "Узнать прогноз"
     }, {
-      "text" : "ПОгода в Саратове завтра"
+      "text" : "узнать погоду"
     }, {
-      "text" : "Какая погода в Москве на следующей неделе"
+      "text" : "скажи мне прогноз"
+    }, {
+      "text" : "прогноз"
     } ],
     "classificationRules" : {
       "refs" : [ ]
@@ -54,13 +110,15 @@
     "slots" : [ {
       "name" : "city",
       "entity" : "mystem.geo",
-      "required" : true,
-      "prompts" : [ "Укажите, пожалуйста, название города, для которого хотите узнать прогноз погоды.", "Скажите, пожалуйста, для какого города вы хотите получить прогноз?", "Прогноз для какого города хотите получить?" ]
+      "required" : false,
+      "prompts" : [ "Укажите, пожалуйста, название города, для которого хотите узнать прогноз погоды.", "Скажите, пожалуйста, для какого города вы хотите получить прогноз?", "Прогноз для какого города хотите получить?" ],
+      "array" : false
     }, {
       "name" : "date",
       "entity" : "duckling.date",
       "required" : false,
-      "prompts" : [ ]
+      "prompts" : [ ],
+      "array" : false
     } ],
     "priority" : 0
   }, {
@@ -104,12 +162,14 @@
       "name" : "city",
       "entity" : "mystem.geo",
       "required" : true,
-      "prompts" : [ ]
+      "prompts" : [ ],
+      "array" : false
     }, {
       "name" : "date",
       "entity" : "duckling.date",
       "required" : false,
-      "prompts" : [ ]
+      "prompts" : [ ],
+      "array" : false
     } ],
     "priority" : 0
   }, {
@@ -127,8 +187,37 @@
       "name" : "date",
       "entity" : "duckling.date",
       "required" : true,
-      "prompts" : [ ]
+      "prompts" : [ ],
+      "array" : false
     } ],
+    "priority" : 0
+  }, {
+    "path" : "/bye",
+    "enabled" : true,
+    "shared" : false,
+    "phrases" : [ {
+      "text" : "пока"
+    }, {
+      "text" : "досвидание"
+    }, {
+      "text" : "до свидания"
+    }, {
+      "text" : "чау"
+    }, {
+      "text" : "до встречи"
+    }, {
+      "text" : "до связи"
+    }, {
+      "text" : "пока пока"
+    }, {
+      "text" : "бай"
+    }, {
+      "text" : "гудбай"
+    } ],
+    "classificationRules" : {
+      "refs" : [ ]
+    },
+    "patterns" : [ ],
     "priority" : 0
   } ],
   "entities" : [ ],

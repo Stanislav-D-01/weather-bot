@@ -22,7 +22,10 @@ function getWeather (lat, lon, dateS, dateF) {
     });
     
     if ((dateS && !dateRegex.test(dateS)) || (dateF && !dateRegex.test(dateF)))
-        return 'error date'
+        return res = {
+                error: true,
+                textError: 'bad date'
+            }
     
     if (resWeather.isOk) {
         var indexWeatherStart = resWeather.data.hourly.time.indexOf(dateS);
@@ -41,15 +44,22 @@ function getWeather (lat, lon, dateS, dateF) {
             return res = {
                 minT: Math.round(minT),
                 maxT: Math.round(maxT),
+                error: false,
             }
             
         }
         else{
-            return 'error'
+            return res = {
+                error: true,
+                textError: 'bad request'
+            }
         }
     }
     else {
-        return 'error server'
+        return res = {
+                error: true,
+                textError: resWeather.error
+            }
     }
 }
 
@@ -74,6 +84,7 @@ function getGeoPosition (city) {
     else {
         return position = {
             err: true,
+            textErr: res.error
         }
     }
     return position
@@ -88,8 +99,8 @@ function getDateForRequest (date) {
     finalDate.setDate(tempDate + 7);
     startDate.setUTCHours(0, 0, 0, 0);
     finalDate.setUTCHours(23, 0, 0, 0);
-    var onlyDateStart = startDate.getDate()+'.'+(startDate.getMonth()+1)+'.'+startDate.getFullYear();
-    var onlyDateFinal = finalDate.getDate()+'.'+(finalDate.getMonth()+1)+'.'+finalDate.getFullYear();
+    var onlyDateStart = formatDate(startDate)
+    var onlyDateFinal = formatDate(finalDate)
 
     return dates = {
         startDate: startDate.toISOString().match(/^\d{4}\-\d{2}\-\d{2}T\d{2}:\d{2}/g)[0],
@@ -97,8 +108,19 @@ function getDateForRequest (date) {
         onlyDateStart: onlyDateStart,
         onlyDateFinal: onlyDateFinal
     }
-}    
+}   
 
+function formatDate(date) {
+    var day = date.getDate();
+    var month = date.getMonth() + 1;
+    var year = date.getFullYear();
+    
+    // Добавляем ведущие нули только если число меньше 10
+    var formattedDay = (day < 10 ? '0' : '') + day;
+    var formattedMonth = (month < 10 ? '0' : '') + month;
+    
+    return formattedDay + '.' + formattedMonth + '.' + year;
+}
 
 
 function checkWeekDate (query) {
@@ -150,4 +172,29 @@ function checkDate(date){
         
   }
    
+function resetAllSessionData (session) {
+    session.dateFlagWeek = null;
+    session.date = null;
+    session.onlyDate = null;
+    session.onlyDateFinal = null;
+    session.dateFinalWeek = null;
+    session.city = null;
+    session.lat = null;
+    session.lon = null;
+    session.stateCounterInARow = null;
+    session.stateCounter = null;
+}
 
+function resetCityData (session){
+    session.city = null;
+    session.lat = null;
+    session.lon = null;   
+}
+
+function resetDateData (session){
+    session.dateFlagWeek = null;
+    session.date = null;
+    session.onlyDate = null;
+    session.onlyDateFinal = null;
+    session.dateFinalWeek = null;
+}

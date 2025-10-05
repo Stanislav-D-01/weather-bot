@@ -43,7 +43,6 @@ theme: /
                 $session.city = $caila.inflect($parseTree._city, ["nomn"])
                 $session.lat = getGeoPosition($session.city).lat
                 $session.lon = getGeoPosition($session.city).lon
-            a: dsadsad {{$parseTree._date}}
             go!: /GetDate
         else:
             go!: /GetCity
@@ -59,7 +58,9 @@ theme: /
             intent: /city
             script:
                 $session.date = $parseTree._date? $parseTree._date.value : null
-                $session.city = $parseTree._city;
+                $session.city = $parseTree._city? $parseTree._city : null;
+            if: !$parseTree._city
+                go!: /GetCity 
             if: $session.date
                 script:
                     $session.dateFlagWeek = checkWeekDate($request.query)   //флаг true если запрос прогноза на неделю
@@ -69,10 +70,9 @@ theme: /
                     $session.dateFinalWeek = $session.dateFlagWeek? getDateForRequest($parseTree._date.value).finalDate : null
                 go!: /CheckDate
             else:
-                a: ыфввыфв{{$session.date}}
                 go!: /GetDate
          
-        state: CatchAll noContext = true
+        state: CatchAll || noContext = true
             event: noMatch
             if: $context.session.lastState !== $context.currentState
                 script:
@@ -86,6 +86,8 @@ theme: /
                     a: К сожалению, не понял вас. Укажите, пожалуйста, нужный вам город.
             else:
                 a: Простите! Кажется, я пока не умею узнавать прогноз погоды с такими параметрами, но постараюсь поскорее научиться.
+                script:
+                    resetAllSessionData($session)
                 go!: /SomethingElse    
             timeout: /StopSession || interval = "1 minutes"
     
@@ -103,12 +105,22 @@ theme: /
                 $session.onlyDate = getDateForRequest($parseTree._date.value).onlyDateStart
                 $session.onlyDateFinal = getDateForRequest($parseTree._date.value).onlyDateFinal
                 $session.dateFinalWeek = $session.dateFlagWeek? getDateForRequest($parseTree._date.value).finalDate : null
-                
             go!: /CheckDate
             
-        state: CatchAll
+        state: CatchAll || noContext = true
             event: noMatch
-            a: dsfdsf
+            script:
+                $session.stateCounterInARow = $session.stateCounterInARow? $session.stateCounterInARow++ : 1
+            if: ($session.stateCounterInARow && $session.stateCounterInARow < 3) 
+                random:
+                    a: Извините, не совсем понял вас. Напишите, пожалуйста, нужную вам дату.
+                    a: К сожалению, не понял вас. Введите, пожалуйста, дату, которая вам нужна.
+            else:
+                script:
+                    resetAllSessionData($session)
+                a: Простите! Кажется, я пока не умею узнавать прогноз погоды с такими параметрами, но постараюсь поскорее научиться.
+                go!: /SomethingElse
+            timeout: /StopSession || interval = "1 minutes"
     
     state: CheckDate
         if: checkDate($session.date).past
@@ -117,17 +129,11 @@ theme: /
             go!: /ThisDayIsNotComingSoon
         else:
             go!: /TellWeather
-        timeout: /StopSession || interval = "1 minutes"
     
     state: ThisDayHasPassed
         script:
-            $session.date = null;
-        if: $context.session.lastState == '/GetDate'
-            script:
-                $session.stateCounter++
-        else:
-            script:
-                $session.stateCounter = 1
+            resetDateData ($session)
+            $session.stateCounter = $session.stateCounter? $session.stateCounter++ : 1
         if: ($session.stateCounter < 3)
             random:
                 a: К сожалению, я не могу узнать прогноз погоды на период времени в прошлом.
@@ -135,19 +141,15 @@ theme: /
             go!: /GetDate
         else:
             script:
-                $session.city = null;
-                $session.lat = null;
-                $session.lon = null;
-                $session.date = null;
-                $session.stateCounter = null;
+                resetAllSessionData($session)
             a: Простите! Кажется, я пока не умею узнавать прогноз погоды с такими параметрами, но постараюсь поскорее научиться.
             go!: /SomethingElse
         timeout: /StopSession || interval = "1 minutes"
             
     state: ThisDayIsNotComingSoon
         script:
-            $session.date = null;
-        if: $context.session.lastState == '/GetDate'
+             resetDateData ($session)
+        if: $session.stateCounter
             script:
                 $session.stateCounter++
         else:
@@ -160,11 +162,7 @@ theme: /
             go!: /GetDate
         else:
             script:
-                $session.city = null;
-                $session.lat = null;
-                $session.lon = null;
-                $session.date = null;
-                $session.stateCounter = null;
+                resetAllSessionData($session)
             a: Простите! Кажется, я пока не умею узнавать прогноз погоды с такими параметрами, но постараюсь поскорее научиться.
             go!: /SomethingElse
         timeout: /StopSession || interval = "1 minutes"
@@ -175,34 +173,34 @@ theme: /
             $session.lon = getGeoPosition($session.city).lon;
             $temp.temperatureMax = getWeather ($session.lat, $session.lon, $session.date, $session.dateFinalWeek).maxT
             $temp.temperatureMin = getWeather ($session.lat, $session.lon, $session.date, $session.dateFinalWeek).minT
-        if: getGeoPosition.err || !$temp.temperatureMax || !$temp.temperatureMin
+        if: getWeather.err || getGeoPosition.err || !$temp.temperatureMax || !$temp.temperatureMin
             script:
                 $session.stateCounter = $session.stateCounter? $session.stateCounter : 0
+                log(getGeoPosition.textErr || getWeather.err)
             go!: ./Error
+            
+        if: !$session.dateFlagWeek //прогноз на 1 день иначе на 1 неделю
+            random:
+                a: У меня получилось уточнить: на {{ $session.onlyDate }} в {{capitalize($nlp.inflect($session.city, "loct"))}} температура воздуха составит от {{ $temp.temperatureMin }} до {{ $temp.temperatureMax }} {{$nlp.conform("градусов", $temp.temperatureMax)}} по Цельсию.
+                a: Смог узнать для вас прогноз: на {{ $session.onlyDate }} в {{capitalize($nlp.inflect($session.city, "loct"))}} будет от {{ $temp.temperatureMin }} до {{ $temp.temperatureMax }} {{$nlp.conform("градусов", $temp.temperatureMax)}} по Цельсию.
+        else:                   
+            random: 
+                a: У меня получилось уточнить: на неделю с {{ $session.onlyDate }} по {{$session.onlyDateFinal}} в {{capitalize($nlp.inflect($session.city, "loct"))}} температура воздуха составит от {{ $temp.temperatureMin }} до {{ $temp.temperatureMax }} {{$nlp.conform("градусов", $temp.temperatureMax)}} по Цельсию.
+                a: Смог узнать для вас прогноз: на неделю с {{ $session.onlyDate }} по {{$session.onlyDateFinal}} в {{capitalize($nlp.inflect($session.city, "loct"))}} будет от {{ $temp.temperatureMin }} до {{ $temp.temperatureMax }} {{$nlp.conform("градусов", $temp.temperatureMax)}} по Цельсию.
+        script:
+            resetAllSessionData($session)
+        go!: /SomethingElse
             
         state: Error
             script:
-                $session.stateCounter = $session.stateCounter? $session.stateCounter : 0
-                $session.stateCounter++
+                $session.stateCounter = $session.stateCounter? $session.stateCounter++ : 1
             if: ($session.stateCounter < 3)
                 go!: /TellWeather
             else:
                 script:
-                    $session.stateCounter = null;
+                   resetAllSessionData($session)
                 a: Мне очень жаль, но при обращении к сервису, содержащему сведения о погоде, произошла ошибка. Пожалуйста, попробуйте написать мне немного позже. Надеюсь, работоспособность сервиса восстановится.
-                
                 go!: /SomethingElse
-        
-        if: !$session.dateFlagWeek
-            random:
-                a: У меня получилось уточнить: на {{ $session.onlyDate }} в {{capitalize($nlp.inflect($session.city, "loct"))}} температура воздуха составит от {{ $temp.temperatureMin }} до {{ $temp.temperatureMax }} {{$nlp.conform("градусов", $temp.temperatureMax)}} по Цельсию.
-                a: Смог узнать для вас прогноз: на {{ $session.onlyDate }} в {{capitalize($nlp.inflect($session.city, "loct"))}} будет от {{ $temp.temperatureMin }} до {{ $temp.temperatureMax }} {{$nlp.conform("градусов", $temp.temperatureMax)}} по Цельсию.
-            go!: /SomethingElse
-        else:
-            random:
-                a: У меня получилось уточнить: на неделю с {{ $session.onlyDate }} по {{$session.onlyDateFinal}} в {{capitalize($nlp.inflect($session.city, "loct"))}} температура воздуха составит от {{ $temp.temperatureMin }} до {{ $temp.temperatureMax }} {{$nlp.conform("градусов", $temp.temperatureMax)}} по Цельсию.
-                a: Смог узнать для вас прогноз: на неделю с {{ $session.onlyDate }} по {{$session.onlyDateFinal}} в {{capitalize($nlp.inflect($session.city, "loct"))}} будет от {{ $temp.temperatureMin }} до {{ $temp.temperatureMax }} {{$nlp.conform("градусов", $temp.temperatureMax)}} по Цельсию.
-            go!: /SomethingElse
     
             
     state: SomethingElse
@@ -220,6 +218,10 @@ theme: /
             });
         timeout: /StopSession || interval = "1 minutes"
             
+        
+    
+    
+    
     state: StopSession
         script:
             $jsapi.stopSession();
