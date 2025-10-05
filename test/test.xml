@@ -1,2 +1,32 @@
 <test>
+    <test-case id="Приветствие">
+        <q>привет</q>
+        <a state="/Start"/>
+        <a state="/GetCity"/>
+        <timeoutReply targetState="/StopSession"/>
+        <timeout/>
+    </test-case>
+    
+    <test-case id="/Start">
+        <q>/start</q>
+        <a state="/Start"/>
+        <a state="/GetCity"/>
+        <timeoutReply targetState="/StopSession"/>
+        <timeout/>
+    </test-case> 
+    
+    <test-case id="Назвал город">
+        <q>привет</q>
+        <a state="/Start"/>
+        <a state="/GetCity"/>
+        <timeoutReply targetState="/StopSession"/>
+        <q>Москва</q>
+        <a state="/GetDate"/>
+        <timeoutReply targetState="/StopSession"/>
+        <q>на вторник</q>
+        <a state="/TellWeather"/>
+        <a state="/SomethingElse"/>
+    </test-case>
+    
+    
 </test>    

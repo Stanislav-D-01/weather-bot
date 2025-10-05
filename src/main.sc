@@ -9,8 +9,12 @@ theme: /
     state: Start
         q!: $regex</start>
         intent!: /hi
-        script:
-            $client.name = $request.userFrom.firstName
+        if: $request.userFrom
+            script:
+                $client.name = ($request.userFrom.firstName && $request.userFrom && $request.userFrom.firstName) ? $request.userFrom.firstName : null
+        else: 
+            script:
+                $client.name = null
         if: $client.name
             random:
                 a: {{ $client.name }}, здравствуйте! Артур из Just Tour на связи. Рад снова видеть вас в чате!
