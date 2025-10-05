@@ -55,6 +55,26 @@
     "patterns" : [ ],
     "priority" : 0
   }, {
+    "path" : "/dont_have_questions",
+    "enabled" : true,
+    "shared" : false,
+    "phrases" : [ {
+      "text" : "нет вопросов"
+    }, {
+      "text" : "больше ничего не интересует"
+    }, {
+      "text" : "все достаточно"
+    }, {
+      "text" : "хватит"
+    }, {
+      "text" : "все понял"
+    } ],
+    "classificationRules" : {
+      "refs" : [ ]
+    },
+    "patterns" : [ ],
+    "priority" : 0
+  }, {
     "path" : "/what_can_you_do",
     "enabled" : true,
     "shared" : false,

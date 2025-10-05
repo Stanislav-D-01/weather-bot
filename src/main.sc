@@ -188,7 +188,6 @@ theme: /
                 a: У меня получилось уточнить: на неделю с {{ $session.onlyDate }} по {{$session.onlyDateFinal}} в {{capitalize($nlp.inflect($session.city, "loct"))}} температура воздуха составит от {{ $temp.temperatureMin }} до {{ $temp.temperatureMax }} {{$nlp.conform("градусов", $temp.temperatureMax)}} по Цельсию.
                 a: Смог узнать для вас прогноз: на неделю с {{ $session.onlyDate }} по {{$session.onlyDateFinal}} в {{capitalize($nlp.inflect($session.city, "loct"))}} будет от {{ $temp.temperatureMin }} до {{ $temp.temperatureMax }} {{$nlp.conform("градусов", $temp.temperatureMax)}} по Цельсию.
         script:
-            resetAllSessionData($session)
         go!: /SomethingElse
             
         state: Error
@@ -218,7 +217,82 @@ theme: /
             });
         timeout: /StopSession || interval = "1 minutes"
             
-        
+        state: AnotherOne
+            intent: /weather_forecast
+            if: ($parseTree._date && $parseTree._date !== $session.date) && ($parseTree._city && $parseTree._city !== $session.city)
+                script:
+                    $session.dateFlagWeek = checkWeekDate($request.query)   //флаг true если запрос прогноза на неделю
+                    $session.date = getDateForRequest($parseTree._date.value).startDate
+                    $session.onlyDate = getDateForRequest($parseTree._date.value).onlyDateStart
+                    $session.onlyDateFinal = getDateForRequest($parseTree._date.value).onlyDateFinal
+                    $session.dateFinalWeek = $session.dateFlagWeek? getDateForRequest($parseTree._date.value).finalDate : null
+                    $session.city = $caila.inflect($parseTree._city, ["nomn"])
+                go!: /CheckDate
+            elseif: ($parseTree._date && $parseTree._date !== $session.date) && !$parseTree._city
+                script:
+                    $session.dateFlagWeek = checkWeekDate($request.query)   //флаг true если запрос прогноза на неделю
+                    $session.date = getDateForRequest($parseTree._date.value).startDate
+                    $session.onlyDate = getDateForRequest($parseTree._date.value).onlyDateStart
+                    $session.onlyDateFinal = getDateForRequest($parseTree._date.value).onlyDateFinal
+                    $session.dateFinalWeek = $session.dateFlagWeek? getDateForRequest($parseTree._date.value).finalDate : null
+                go!: /GetCity
+            elseif: !$parseTree._date && ($parseTree._city && $parseTree._city !== $session.city)
+                script:
+                    $session.city = $caila.inflect($parseTree._city, ["nomn"])
+                go!: /GetDate
+            else:
+                script:
+                    resetAllSessionData($session);
+                go!: /GetCity
+                
+            state: Agree
+                q: $regexp_i<\b(да|угу|ага|наверное|возможно)\b.*>
+                script:
+                    resetAllSessionData($session);
+                go!: /GetCity
+                
+            state: DontHaveQuestions
+                q: $regexp_i<\b(нет|спасибо|не)\b.*>
+                intent!: /dont_have_questions
+                random:
+                    a: Вас понял!
+                    a: Хорошо!
+                    a: Понял!
+                go!: /Goodbye
+                
+            state: CatchAll
+                event: noMatch
+                if: $context.session.lastState !== $context.currentState
+                    script:
+                        $session.stateCounterInARow = 1;
+                else:
+                    script:
+                        $session.stateCounterInARow++;
+                if: ($session.stateCounterInARow && $session.stateCounterInARow < 3)    
+                random:
+                    a: Извините, не совсем понял. Пожалуйста, подскажите, могу ли я еще чем-то помочь?
+                    a: К сожалению, не смог понять, что вы имеете в виду. Подскажите, остались ли у вас еще вопросы?
+                script:
+                    $response.replies = $response.replies || [];
+                    $response.replies.push({
+                        "type": "buttons",
+                        "buttons": [
+                        {"text": "Узнать прогноз погоды"}
+                        ]
+                    });
+                else:
+                    a: Простите, так и не смог понять, что вы имели в виду.
+                    go!: /Goodbye
+    
+    state: Goodbye
+        intent!: /bye
+        random:
+            a: Всего доброго!
+            a: Всего вам доброго!
+            a: Всего доброго, до свидания!
+        go!: /StopSession
+                
+            
     
     
     
