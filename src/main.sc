@@ -178,12 +178,9 @@ theme: /
             $temp.temperatureMax = getWeather ($session.lat, $session.lon, $session.date, $session.dateFinalWeek).maxT
             $temp.temperatureMin = getWeather ($session.lat, $session.lon, $session.date, $session.dateFinalWeek).minT
         if: getWeather.err || getGeoPosition.err || !$temp.temperatureMax || !$temp.temperatureMin
-            script:
-                $session.stateCounter = $session.stateCounter? $session.stateCounter : 0
-                log(getGeoPosition.textErr || getWeather.err)
             go!: ./Error
             
-        if: !$session.dateFlagWeek //прогноз на 1 день иначе на 1 неделю
+        elseif: !$session.dateFlagWeek //прогноз на 1 день иначе на 1 неделю
             random:
                 a: У меня получилось уточнить: на {{ $session.onlyDate }} в {{capitalize($nlp.inflect($session.city, "loct"))}} температура воздуха составит от {{ $temp.temperatureMin }} до {{ $temp.temperatureMax }} {{$nlp.conform("градусов", $temp.temperatureMax)}} по Цельсию.
                 a: Смог узнать для вас прогноз: на {{ $session.onlyDate }} в {{capitalize($nlp.inflect($session.city, "loct"))}} будет от {{ $temp.temperatureMin }} до {{ $temp.temperatureMax }} {{$nlp.conform("градусов", $temp.temperatureMax)}} по Цельсию.
@@ -195,8 +192,12 @@ theme: /
         go!: /SomethingElse
             
         state: Error
-            script:
-                $session.stateCounter = $session.stateCounter? $session.stateCounter++ : 1
+            if: $session.stateCounter
+                script:
+                 $session.stateCounter++;
+            else:
+                script:
+                    $session.stateCounter = 1;
             if: ($session.stateCounter < 3)
                 go!: /TellWeather
             else:

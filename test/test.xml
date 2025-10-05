@@ -53,7 +53,7 @@
                         "2025-10-05T20:00",
                         "2025-10-05T21:00",
                         "2025-10-05T22:00",
-                        "2025-10-05T23:00",
+                        "2025-10-05T23:00"
                     ],
                 "temperature_2m": [
                     10.3,
@@ -78,7 +78,7 @@
                     9.7,
                     9.5,
                     9.4,
-                    9.4,
+                    9.4
                 ]}
             }
         </response>
@@ -102,6 +102,7 @@
     
     
     <test-case id="Назвал город">
+        <dateTime>2025-10-05 15:30:00</dateTime>
         <q>привет</q>
         <a state="/Start"/>
         <a state="/GetCity"/>
@@ -109,9 +110,8 @@
         <q>Москва</q>
         <a state="/GetDate"/>
         <timeoutReply targetState="/StopSession"/>
-        
-        <q>завтра</q>
-        <a state="/TellWeather"/> 
+        <q>сегодня</q>
+        <a state="/TellWeather"/>
         <a state="/SomethingElse"/>
     </test-case>
     
