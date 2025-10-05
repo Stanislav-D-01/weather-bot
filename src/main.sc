@@ -52,11 +52,14 @@ theme: /
             go!: /GetCity
             
     state: GetCity 
-        random:
-            a: Укажите, пожалуйста, название города, для которого хотите узнать прогноз погоды.
-            a: Скажите, пожалуйста, для какого города вы хотите получить прогноз?
-            a: Прогноз для какого города хотите получить?
-        timeout: /StopSession || interval = "1 minutes"
+        if: $session.city
+            go!:/CheckDate
+        else:
+            random:
+                a: Укажите, пожалуйста, название города, для которого хотите узнать прогноз погоды.
+                a: Скажите, пожалуйста, для какого города вы хотите получить прогноз?
+                a: Прогноз для какого города хотите получить?
+            timeout: /StopSession || interval = "1 minutes"
             
         state: UserCity
             intent: /city
@@ -96,9 +99,12 @@ theme: /
             timeout: /StopSession || interval = "1 minutes"
     
     state: GetDate
-        random:
-            a: На какую дату требуется прогноз?
-            a: Прогноз погоды на какую дату вам нужен?
+        if: $session.date
+            go!: /CheckDate
+        else:
+            random:
+                a: На какую дату требуется прогноз?
+                a: Прогноз погоды на какую дату вам нужен?
         timeout: /StopSession || interval = "1 minutes"
         
         state: UserDate
@@ -113,8 +119,12 @@ theme: /
             
         state: CatchAll || noContext = true
             event: noMatch
-            script:
-                $session.stateCounterInARow = $session.stateCounterInARow? $session.stateCounterInARow++ : 1
+            if: $session.stateCounterInARow
+                script:                
+                    $session.stateCounterInARow++
+            else:
+                script:
+                    $session.stateCounterInARow = 1
             if: ($session.stateCounterInARow && $session.stateCounterInARow < 3) 
                 random:
                     a: Извините, не совсем понял вас. Напишите, пожалуйста, нужную вам дату.
@@ -224,7 +234,9 @@ theme: /
             
         state: AnotherOne
             intent: /weather_forecast
-            if: ($parseTree._date && $parseTree._date !== $session.date) && ($parseTree._city && $parseTree._city !== $session.city)
+            script:
+                
+            if: $parseTree._date  && $parseTree._city
                 script:
                     $session.dateFlagWeek = checkWeekDate($request.query)   //флаг true если запрос прогноза на неделю
                     $session.date = getDateForRequest($parseTree._date.value).startDate
@@ -233,7 +245,7 @@ theme: /
                     $session.dateFinalWeek = $session.dateFlagWeek? getDateForRequest($parseTree._date.value).finalDate : null
                     $session.city = $caila.inflect($parseTree._city, ["nomn"])
                 go!: /CheckDate
-            elseif: ($parseTree._date && $parseTree._date !== $session.date) && !$parseTree._city
+            elseif: $parseTree._date && !$parseTree._city
                 script:
                     $session.dateFlagWeek = checkWeekDate($request.query)   //флаг true если запрос прогноза на неделю
                     $session.date = getDateForRequest($parseTree._date.value).startDate
@@ -241,7 +253,7 @@ theme: /
                     $session.onlyDateFinal = getDateForRequest($parseTree._date.value).onlyDateFinal
                     $session.dateFinalWeek = $session.dateFlagWeek? getDateForRequest($parseTree._date.value).finalDate : null
                 go!: /GetCity
-            elseif: !$parseTree._date && ($parseTree._city && $parseTree._city !== $session.city)
+            elseif: !$parseTree._date && $parseTree._city
                 script:
                     $session.city = $caila.inflect($parseTree._city, ["nomn"])
                 go!: /GetDate
@@ -250,44 +262,44 @@ theme: /
                     resetAllSessionData($session);
                 go!: /GetCity
                 
-            state: Agree
-                q: $regexp_i<\b(да|угу|ага|наверное|возможно)\b.*>
+        state: Agree
+            q: $regexp_i<\b(да|угу|ага|наверное|возможно)\b.*>
+            script:
+                resetAllSessionData($session);
+            go!: /GetCity
+                
+        state: DontHaveQuestions
+            q: $regexp_i<\b(нет|спасибо|не)\b.*>
+            intent!: /dont_have_questions
+            random:
+                a: Вас понял!
+                a: Хорошо!
+                a: Понял!
+            go!: /Goodbye
+                
+        state: CatchAll
+            event: noMatch
+            if: $context.session.lastState !== $context.currentState
                 script:
-                    resetAllSessionData($session);
-                go!: /GetCity
-                
-            state: DontHaveQuestions
-                q: $regexp_i<\b(нет|спасибо|не)\b.*>
-                intent!: /dont_have_questions
+                    $session.stateCounterInARow = 1;
+            else:
+                script:
+                    $session.stateCounterInARow++;
+            if: ($session.stateCounterInARow && $session.stateCounterInARow < 3)    
                 random:
-                    a: Вас понял!
-                    a: Хорошо!
-                    a: Понял!
+                    a: Извините, не совсем понял. Пожалуйста, подскажите, могу ли я еще чем-то помочь?
+                    a: К сожалению, не смог понять, что вы имеете в виду. Подскажите, остались ли у вас еще вопросы?
+                script:
+                    $response.replies = $response.replies || [];
+                    $response.replies.push({
+                        "type": "buttons",
+                        "buttons": [
+                        {"text": "Узнать прогноз погоды"}
+                        ]
+                    });
+            else:
+                a: Простите, так и не смог понять, что вы имели в виду.
                 go!: /Goodbye
-                
-            state: CatchAll
-                event: noMatch
-                if: $context.session.lastState !== $context.currentState
-                    script:
-                        $session.stateCounterInARow = 1;
-                else:
-                    script:
-                        $session.stateCounterInARow++;
-                if: ($session.stateCounterInARow && $session.stateCounterInARow < 3)    
-                    random:
-                        a: Извините, не совсем понял. Пожалуйста, подскажите, могу ли я еще чем-то помочь?
-                        a: К сожалению, не смог понять, что вы имеете в виду. Подскажите, остались ли у вас еще вопросы?
-                    script:
-                        $response.replies = $response.replies || [];
-                        $response.replies.push({
-                            "type": "buttons",
-                            "buttons": [
-                            {"text": "Узнать прогноз погоды"}
-                            ]
-                        });
-                else:
-                    a: Простите, так и не смог понять, что вы имели в виду.
-                    go!: /Goodbye
     
     state: Goodbye
         intent!: /bye

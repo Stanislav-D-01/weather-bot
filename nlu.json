@@ -48,6 +48,8 @@
       "text" : "ты робот?"
     }, {
       "text" : "ты человек?"
+    }, {
+      "text" : "Кто ты?"
     } ],
     "classificationRules" : {
       "refs" : [ ]
