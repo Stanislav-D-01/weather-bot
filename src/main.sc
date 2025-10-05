@@ -269,17 +269,17 @@ theme: /
                     script:
                         $session.stateCounterInARow++;
                 if: ($session.stateCounterInARow && $session.stateCounterInARow < 3)    
-                random:
-                    a: Извините, не совсем понял. Пожалуйста, подскажите, могу ли я еще чем-то помочь?
-                    a: К сожалению, не смог понять, что вы имеете в виду. Подскажите, остались ли у вас еще вопросы?
-                script:
-                    $response.replies = $response.replies || [];
-                    $response.replies.push({
-                        "type": "buttons",
-                        "buttons": [
-                        {"text": "Узнать прогноз погоды"}
-                        ]
-                    });
+                    random:
+                        a: Извините, не совсем понял. Пожалуйста, подскажите, могу ли я еще чем-то помочь?
+                        a: К сожалению, не смог понять, что вы имеете в виду. Подскажите, остались ли у вас еще вопросы?
+                    script:
+                        $response.replies = $response.replies || [];
+                        $response.replies.push({
+                            "type": "buttons",
+                            "buttons": [
+                            {"text": "Узнать прогноз погоды"}
+                            ]
+                        });
                 else:
                     a: Простите, так и не смог понять, что вы имели в виду.
                     go!: /Goodbye
@@ -293,6 +293,34 @@ theme: /
         go!: /StopSession
                 
             
+    state: AreYouRobot
+        intent!: /who_are_you
+        random:
+            a: Я Артур — бот-помощник компании Just Tour, всегда готов отвечать на ваши вопросы.
+            a: Вы общаетесь с Артуром — чат-ботом, разработанным командой Just Tour, чтобы помогать вам. Всегда рад пообщаться с вами!
+        go!: /SomethingElse
+    
+    state: WhatCanYouDo
+        intent!: /what_can_you_do
+        random:
+            a: Умею рассказывать о погоде в городах мира на ближайшие дни.
+            a: С удовольствием расскажу вам о ближайших метеопрогнозах для разных городов.
+        go!: /SomethingElse
+    
+    
+    state: GlobalCatchAll || noContext = true
+        event!: noMatch
+        script:
+            $session.stateCounterInARow = $session.stateCounterInARow? $session.stateCounterInARow++ : 1
+        if: ($session.stateCounterInARow && $session.stateCounterInARow < 3)
+            random:
+                a: Прошу прощения, не совсем вас понял. Попробуйте, пожалуйста, переформулировать ваш вопрос.
+                a: Простите, не совсем понял. Что именно вас интересует?
+                a: Простите, не получилось вас понять. Переформулируйте, пожалуйста.
+                a: Не совсем понял вас. Пожалуйста, попробуйте задать вопрос по-другому.
+        else:
+            a: Кажется, этот вопрос не в моей компетенции. Но я постоянно учусь новому, и, надеюсь, совсем скоро научусь отвечать и на него.
+            go!: /SomethingElse
     
     
     
@@ -300,6 +328,17 @@ theme: /
         script:
             $jsapi.stopSession();
         
-    state: Match
+    state: AnyError
         event!: match
-        a: {{$context.intent.answer}}
+        # a: {{$context.intent.answer}}
+        random:
+            a: Извините, произошла техническая ошибка. Специалисты обязательно изучат ее и возьмут в работу. Пожалуйста, напишите в чат позже.
+            a: Простите, произошла ошибка в системе. Наши специалисты обязательно ее исправят. Пожалуйста, напишите мне позже.
+        script:
+                    $response.replies = $response.replies || [];
+                    $response.replies.push({
+                        "type": "buttons",
+                        "buttons": [
+                        {"text": "Узнать прогноз погоды"}
+                        ]
+                    });
