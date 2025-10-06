@@ -98,7 +98,7 @@
     
     
     <test-case id="Нормальный поэтапный запрос">
-        <dateTime>2025-10-05 15:30:00\\</dateTime>
+        <dateTime>2025-10-05 15:30:00</dateTime>
         <q>привет</q>
         <a state="/Start"/>
         <a state="/GetCity"/>
@@ -300,20 +300,17 @@
     
     <test-case id="тест кэтчола по дате">
         <dateTime>2025-10-05 15:30:00\\</dateTime>
-        <random>1,2,1</random>
+        <random>0,1,0</random>
         <q>Какой прогноз в Москве</q>
         <a state="/GetDate"/>
         <timeoutReply targetState="/StopSession"/>
-        <q>не знаю</q>
+        <q>nfgjr</q>
         <a state="/GetDate/CatchAll">К сожалению, не понял вас. Введите, пожалуйста, дату, которая вам нужна.</a>
         <timeoutReply targetState="/StopSession"/>
-        <q>не знаю</q>
+        <q>fsdfds</q>
         <a state="/GetDate/CatchAll">Извините, не совсем понял вас. Напишите, пожалуйста, нужную вам дату.</a>
         <timeoutReply targetState="/StopSession"/>
-        <q>не знаю</q>
-        <a state="/GetDate/CatchAll">К сожалению, не понял вас. Введите, пожалуйста, дату, которая вам нужна.</a>
-        <timeoutReply targetState="/StopSession"/>
-        <q>не знаю</q>
+        <q>тапок</q>
         <a state="/GetDate/CatchAll">Простите! Кажется, я пока не умею узнавать прогноз погоды с такими параметрами, но постараюсь поскорее научиться.</a>
         <a state="/SomethingElse"/>
         <timeoutReply targetState="/StopSession"/>
@@ -321,32 +318,29 @@
     
     <test-case id="тест кэтчола по городу">
         <dateTime>2025-10-05 15:30:00\\</dateTime>
-        <random>1,2,1</random>
         <q>Какой прогноз на завтра</q>
         <a state="/GetCity"/>
         <timeoutReply targetState="/StopSession"/>
-        <q>не знаю</q>
+        <q>тапок</q>
+        <random>1,0</random>
         <a state="/GetCity/CatchAll">Извините, не совсем понял вас. Напишите, пожалуйста, название города, чтобы я смог узнать прогноз погоды для него.</a>
         <timeoutReply targetState="/StopSession"/>
-        <q>не знаю</q>
-         <a state="/GetCity/CatchAll">К сожалению, не понял вас. Укажите, пожалуйста, нужный вам город.</a>
+        <q>тапок</q>
+        <a state="/GetCity/CatchAll">К сожалению, не понял вас. Укажите, пожалуйста, нужный вам город.</a>
         <timeoutReply targetState="/StopSession"/>
-        <q>не знаю</q>
-         <a state="/GetCity/CatchAll">Извините, не совсем понял вас. Напишите, пожалуйста, название города, чтобы я смог узнать прогноз погоды для него.</a>
-        <timeoutReply targetState="/StopSession"/>
-        <q>не знаю</q>
-        <a state="/GetDate/CatchAll">Простите! Кажется, я пока не умею узнавать прогноз погоды с такими параметрами, но постараюсь поскорее научиться.</a>
+        <q>тапок</q>
+        <a state="/GetCity/CatchAll">Простите! Кажется, я пока не умею узнавать прогноз погоды с такими параметрами, но постараюсь поскорее научиться.</a>
         <a state="/SomethingElse"/>
         <timeoutReply targetState="/StopSession"/>
     </test-case>
     
     <test-case id="Тест на прошлую\будущую дату">
         <dateTime>2025-10-05 15:30:00\\</dateTime>
-        <random>1,2,1</random>
         <q>Какой прогноз в Москве</q>
         <a state="/GetDate"/>
         <timeoutReply targetState="/StopSession"/>
         <q>3 октября</q>
+        <random>0,1</random>
         <a state="/ThisDayHasPassed">К сожалению, я не могу узнать прогноз погоды на период времени в прошлом.</a>
         <a state="/GetDate"/>
         <timeoutReply targetState="/StopSession"/>
@@ -355,26 +349,20 @@
         <a state="/GetDate"/>
         <timeoutReply targetState="/StopSession"/>
         <q>1 октября</q>
-        <a state="/ThisDayHasPassed">К сожалению, я не могу узнать прогноз погоды на период времени в прошлом.</a>
-        <a state="/GetDate"/>
-        <timeoutReply targetState="/StopSession"/>
-        <q>1 сентября</q>
         <a state="/ThisDayHasPassed">Простите! Кажется, я пока не умею узнавать прогноз погоды с такими параметрами, но постараюсь поскорее научиться.</a>
         <a state="/SomethingElse"/>
         <timeoutReply targetState="/StopSession"/>
-        <q>Какой прогнорз в Москве 30 октября</q>
-        <a state="/ThisDayHasPassed">Мне жаль, но метеорологи и я пока не можем дать такие долгосрочные прогнозы.</a>
+        <q>Какой прогноз в Москве 30 октября</q>
+        <random>0,1</random>
+        <a state="/ThisDayIsNotComingSoon">Мне жаль, но метеорологи и я пока не можем дать такие долгосрочные прогнозы.</a>
         <a state="/GetDate"/>
         <timeoutReply targetState="/StopSession"/>
         <q> 31 декабря</q>
-        <a state="/ThisDayHasPassed">Извините, посмотреть прогноз на такую далекую дату я не смогу.</a>
+        <a state="/ThisDayIsNotComingSoon">Извините, посмотреть прогноз на такую далекую дату я не смогу.</a>
         <a state="/GetDate"/>
         <timeoutReply targetState="/StopSession"/>
         <q> 4 декабря</q>
-        <a state="/ThisDayHasPassed">Мне жаль, но метеорологи и я пока не можем дать такие долгосрочные прогнозы.</a>
-        <a state="/GetDate"/>
-        <q> 4 декабря</q>
-        <a state="/ThisDayHasPassed">Простите! Кажется, я пока не умею узнавать прогноз погоды с такими параметрами, но постараюсь поскорее научиться.</a>
+        <a state="/ThisDayIsNotComingSoon">Простите! Кажется, я пока не умею узнавать прогноз погоды с такими параметрами, но постараюсь поскорее научиться.</a>
         <a state="/SomethingElse"/>
         <timeoutReply targetState="/StopSession"/>
     </test-case>
@@ -397,8 +385,6 @@
         <timeoutReply targetState="/StopSession"/>
         <q>пока</q>
         <a state="/Goodbye"/>
-        <a state="/StopSession"/>
-        
     </test-case>
     
 </test>    

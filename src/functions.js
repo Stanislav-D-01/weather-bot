@@ -137,7 +137,7 @@ function checkWeekDate (query) {
 }
 
 function checkDate(date){
-    var today = new Date();
+    var today = new Date($jsapi.dateForZone("Europe/Moscow", "yyyy.MM.dd hh:mm:ss"));
     var dateVar = new Date(date);
     today.setUTCHours(0, 0, 0, 0);
     dateVar.setUTCHours(0, 0, 0, 0);
@@ -150,7 +150,7 @@ function checkDate(date){
     finalDate.setDate(currentDate + 7);
     finalDate = finalDate.toISOString();
     today = today.toISOString();
-    
+  
     if (finalDate < dateVar) {
         return res = {
             past: false,

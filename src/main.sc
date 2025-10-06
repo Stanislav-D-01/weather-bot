@@ -138,6 +138,8 @@ theme: /
     
     state: CheckDate
         if: checkDate($session.date).past
+            script:
+                log("ALARM"+$session.date)
             go!: /ThisDayHasPassed
         elseif: checkDate($session.date).away
             go!: /ThisDayIsNotComingSoon
@@ -147,7 +149,12 @@ theme: /
     state: ThisDayHasPassed
         script:
             resetDateData ($session)
-            $session.stateCounter = $session.stateCounter? $session.stateCounter++ : 1
+        if: $session.stateCounter 
+            script:
+                $session.stateCounter++
+        else:
+            script:
+                $session.stateCounter = 1
         if: ($session.stateCounter < 3)
             random:
                 a: К сожалению, я не могу узнать прогноз погоды на период времени в прошлом.
@@ -184,12 +191,12 @@ theme: /
     state: TellWeather
         script:
             $session.resCity = getGeoPosition($session.city)
+            $session.lat = $session.resCity.lat;
+            $session.lon = $session.resCity.lon;
             $session.resWeather = getWeather ($session.lat, $session.lon, $session.date, $session.dateFinalWeek)
-            $session.lat = $session.resWeather.lat;
-            $session.lon = $session.resWeather.lon;
-            $temp.temperatureMax = $session.resWeather.maxT
-            $temp.temperatureMin =$session.resWeather.minT
-        if: $session.resCity.err || $session.resWeather.err || !$temp.temperatureMax || !$temp.temperatureMin
+            $temp.temperatureMax = $session.resWeather.maxT;
+            $temp.temperatureMin =$session.resWeather.minT;
+        if: $session.resCity.err == true || $session.resWeather.err == true || !$temp.temperatureMax || !$temp.temperatureMin
             go!: ./Error
             
         elseif: !$session.dateFlagWeek //прогноз на 1 день иначе на 1 неделю
