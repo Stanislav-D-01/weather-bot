@@ -183,12 +183,16 @@ function resetAllSessionData (session) {
     session.lon = null;
     session.stateCounterInARow = null;
     session.stateCounter = null;
+    session.resCity = null;
+    session.resWeather = null;
 }
 
 function resetCityData (session){
     session.city = null;
     session.lat = null;
-    session.lon = null;   
+    session.lon = null;
+    session.resCity = null;
+    session.resWeather = null;
 }
 
 function resetDateData (session){
@@ -197,4 +201,5 @@ function resetDateData (session){
     session.onlyDate = null;
     session.onlyDateFinal = null;
     session.dateFinalWeek = null;
+    session.resWeather = null;
 }

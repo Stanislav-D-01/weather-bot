@@ -183,11 +183,13 @@ theme: /
     
     state: TellWeather
         script:
-            $session.lat = getGeoPosition($session.city).lat;
-            $session.lon = getGeoPosition($session.city).lon;
-            $temp.temperatureMax = getWeather ($session.lat, $session.lon, $session.date, $session.dateFinalWeek).maxT
-            $temp.temperatureMin = getWeather ($session.lat, $session.lon, $session.date, $session.dateFinalWeek).minT
-        if: getWeather.err || getGeoPosition.err || !$temp.temperatureMax || !$temp.temperatureMin
+            $session.resCity = getGeoPosition($session.city)
+            $session.resWeather = getWeather ($session.lat, $session.lon, $session.date, $session.dateFinalWeek)
+            $session.lat = $session.resWeather.lat;
+            $session.lon = $session.resWeather.lon;
+            $temp.temperatureMax = $session.resWeather.maxT
+            $temp.temperatureMin =$session.resWeather.minT
+        if: $session.resCity.err || $session.resWeather.err || !$temp.temperatureMax || !$temp.temperatureMin
             go!: ./Error
             
         elseif: !$session.dateFlagWeek //прогноз на 1 день иначе на 1 неделю
@@ -327,8 +329,12 @@ theme: /
     
     state: GlobalCatchAll || noContext = true
         event!: noMatch
-        script:
-            $session.stateCounterInARow = $session.stateCounterInARow? $session.stateCounterInARow++ : 1
+        if: $session.stateCounterInARow
+            script:
+                $session.stateCounterInARow++
+        else:
+            script:
+                $session.stateCounterInARow = 1
         if: ($session.stateCounterInARow && $session.stateCounterInARow < 3)
             random:
                 a: Прошу прощения, не совсем вас понял. Попробуйте, пожалуйста, переформулировать ваш вопрос.

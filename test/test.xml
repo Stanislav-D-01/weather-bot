@@ -87,7 +87,6 @@
         <a state="/Start"/>
         <a state="/GetCity"/>
         <timeoutReply targetState="/StopSession"/>
-        <timeout/>
     </test-case>
     
     <test-case id="/Start">
@@ -95,8 +94,6 @@
         <a state="/Start"/>
         <a state="/GetCity"/>
         <timeoutReply targetState="/StopSession"/>
-        <timeout/>
-        
     </test-case> 
     
     
@@ -109,7 +106,7 @@
         <q>Москва</q>
         <a state="/GetDate"/>
         <timeoutReply targetState="/StopSession"/>
-        <q>сегодня</q>
+        <q>на сегодня</q>
         <a state="/TellWeather"/>
         <a state="/SomethingElse"/>
         <timeoutReply targetState="/StopSession"/>
@@ -124,7 +121,7 @@
     <test-case id="Запрос одной фразой">
         <dateTime>2025-10-05 15:30:00\\</dateTime>
         <q>Какой прогноз на сегодня в Москве</q>
-         <a state="/TellWeather"/>
+        <a state="/TellWeather"/>
         <a state="/SomethingElse"/>
         <timeoutReply targetState="/StopSession"/>
     </test-case>
@@ -206,7 +203,202 @@
         <timeoutReply targetState="/StopSession"/>
     </test-case>
     
+    <test-case id="Запрос одной фразой а потом меняем город">
+        <dateTime>2025-10-05 15:30:00\\</dateTime>
+        <q>Какой прогноз на сегодня в Москве</q>
+         <a state="/TellWeather"/>
+        <a state="/SomethingElse"/>
+        <timeoutReply targetState="/StopSession"/>
+         <mockData>
+            <query method="GET">https://geocoding-api.open-meteo.com/v1/search?name=${city}&amp;count=10&amp;language=ru&amp;format=json</query>
+            <parameters>
+                <city>саратов</city>
+            </parameters>
+            <response>
+                {
+                    "results": [
+                        {
+                            "latitude": 55.75222,
+                            "longitude": 37.61556
+                        },
+                        {}
+                    ]
+                }
+            </response>
+        </mockData>
     
+        <mockData>
+            <query>
+                https://api.open-meteo.com/v1/forecast?latitude=${lat}&amp;longitude=${lon}&amp;hourly=temperature_2m&amp;timezone=Europe%2FMoscow&amp;forecast_days=16&amp;wind_speed_unit=ms
+            </query>
+            <parameters>
+                <lat>55.75222</lat>
+                <lon>37.61556</lon>
+            </parameters>
+            <response>
+                {
+                    "hourly": {
+                        "time":[
+                            "2025-10-05T00:00",
+                            "2025-10-05T01:00",
+                            "2025-10-05T02:00",
+                            "2025-10-05T03:00",
+                            "2025-10-05T04:00",
+                            "2025-10-05T05:00",
+                            "2025-10-05T06:00",
+                            "2025-10-05T07:00",
+                            "2025-10-05T08:00",
+                            "2025-10-05T09:00",
+                            "2025-10-05T10:00",
+                            "2025-10-05T11:00",
+                            "2025-10-05T12:00",
+                            "2025-10-05T13:00",
+                            "2025-10-05T14:00",
+                            "2025-10-05T15:00",
+                            "2025-10-05T16:00",
+                            "2025-10-05T17:00",
+                            "2025-10-05T18:00",
+                            "2025-10-05T19:00",
+                            "2025-10-05T20:00",
+                            "2025-10-05T21:00",
+                            "2025-10-05T22:00",
+                            "2025-10-05T23:00"
+                        ],
+                    "temperature_2m": [
+                        10.3,
+                        9.7,
+                        8.8,
+                        8.1,
+                        7.4,
+                        7.3,
+                        7.4,
+                        7.1,
+                        7.5,
+                        7.5,
+                        8.8,
+                        9.9,
+                        9.9,
+                        9.6,
+                        9.6,
+                        9.8,
+                        10.1,
+                        10.3,
+                        10.1,
+                        9.7,
+                        9.5,
+                        9.4,
+                        9.4
+                    ]}
+                }
+            </response>
+        </mockData>
+        <q>а какой прогноз в Саратове</q>
+        <a state="/TellWeather"/>
+        <a state="/SomethingElse"/>
+        <timeoutReply targetState="/StopSession"/>
+    </test-case>
     
+    <test-case id="тест кэтчола по дате">
+        <dateTime>2025-10-05 15:30:00\\</dateTime>
+        <random>1,2,1</random>
+        <q>Какой прогноз в Москве</q>
+        <a state="/GetDate"/>
+        <timeoutReply targetState="/StopSession"/>
+        <q>не знаю</q>
+        <a state="/GetDate/CatchAll">К сожалению, не понял вас. Введите, пожалуйста, дату, которая вам нужна.</a>
+        <timeoutReply targetState="/StopSession"/>
+        <q>не знаю</q>
+        <a state="/GetDate/CatchAll">Извините, не совсем понял вас. Напишите, пожалуйста, нужную вам дату.</a>
+        <timeoutReply targetState="/StopSession"/>
+        <q>не знаю</q>
+        <a state="/GetDate/CatchAll">К сожалению, не понял вас. Введите, пожалуйста, дату, которая вам нужна.</a>
+        <timeoutReply targetState="/StopSession"/>
+        <q>не знаю</q>
+        <a state="/GetDate/CatchAll">Простите! Кажется, я пока не умею узнавать прогноз погоды с такими параметрами, но постараюсь поскорее научиться.</a>
+        <a state="/SomethingElse"/>
+        <timeoutReply targetState="/StopSession"/>
+    </test-case>
+    
+    <test-case id="тест кэтчола по городу">
+        <dateTime>2025-10-05 15:30:00\\</dateTime>
+        <random>1,2,1</random>
+        <q>Какой прогноз на завтра</q>
+        <a state="/GetCity"/>
+        <timeoutReply targetState="/StopSession"/>
+        <q>не знаю</q>
+        <a state="/GetCity/CatchAll">Извините, не совсем понял вас. Напишите, пожалуйста, название города, чтобы я смог узнать прогноз погоды для него.</a>
+        <timeoutReply targetState="/StopSession"/>
+        <q>не знаю</q>
+         <a state="/GetCity/CatchAll">К сожалению, не понял вас. Укажите, пожалуйста, нужный вам город.</a>
+        <timeoutReply targetState="/StopSession"/>
+        <q>не знаю</q>
+         <a state="/GetCity/CatchAll">Извините, не совсем понял вас. Напишите, пожалуйста, название города, чтобы я смог узнать прогноз погоды для него.</a>
+        <timeoutReply targetState="/StopSession"/>
+        <q>не знаю</q>
+        <a state="/GetDate/CatchAll">Простите! Кажется, я пока не умею узнавать прогноз погоды с такими параметрами, но постараюсь поскорее научиться.</a>
+        <a state="/SomethingElse"/>
+        <timeoutReply targetState="/StopSession"/>
+    </test-case>
+    
+    <test-case id="Тест на прошлую\будущую дату">
+        <dateTime>2025-10-05 15:30:00\\</dateTime>
+        <random>1,2,1</random>
+        <q>Какой прогноз в Москве</q>
+        <a state="/GetDate"/>
+        <timeoutReply targetState="/StopSession"/>
+        <q>3 октября</q>
+        <a state="/ThisDayHasPassed">К сожалению, я не могу узнать прогноз погоды на период времени в прошлом.</a>
+        <a state="/GetDate"/>
+        <timeoutReply targetState="/StopSession"/>
+        <q>2 октября</q>
+        <a state="/ThisDayHasPassed">Я не смогу посмотреть прогноз для прошедшего периода.</a>
+        <a state="/GetDate"/>
+        <timeoutReply targetState="/StopSession"/>
+        <q>1 октября</q>
+        <a state="/ThisDayHasPassed">К сожалению, я не могу узнать прогноз погоды на период времени в прошлом.</a>
+        <a state="/GetDate"/>
+        <timeoutReply targetState="/StopSession"/>
+        <q>1 сентября</q>
+        <a state="/ThisDayHasPassed">Простите! Кажется, я пока не умею узнавать прогноз погоды с такими параметрами, но постараюсь поскорее научиться.</a>
+        <a state="/SomethingElse"/>
+        <timeoutReply targetState="/StopSession"/>
+        <q>Какой прогнорз в Москве 30 октября</q>
+        <a state="/ThisDayHasPassed">Мне жаль, но метеорологи и я пока не можем дать такие долгосрочные прогнозы.</a>
+        <a state="/GetDate"/>
+        <timeoutReply targetState="/StopSession"/>
+        <q> 31 декабря</q>
+        <a state="/ThisDayHasPassed">Извините, посмотреть прогноз на такую далекую дату я не смогу.</a>
+        <a state="/GetDate"/>
+        <timeoutReply targetState="/StopSession"/>
+        <q> 4 декабря</q>
+        <a state="/ThisDayHasPassed">Мне жаль, но метеорологи и я пока не можем дать такие долгосрочные прогнозы.</a>
+        <a state="/GetDate"/>
+        <q> 4 декабря</q>
+        <a state="/ThisDayHasPassed">Простите! Кажется, я пока не умею узнавать прогноз погоды с такими параметрами, но постараюсь поскорее научиться.</a>
+        <a state="/SomethingElse"/>
+        <timeoutReply targetState="/StopSession"/>
+    </test-case>
+    
+    <test-case id="Проверка регулярного выражения в стейте Agree">
+        <dateTime>2025-10-05 15:30:00\\</dateTime>
+        <q>Какой прогноз на сегодня в Москве</q>
+        <a state="/TellWeather"/>
+        <a state="/SomethingElse"/>
+        <timeoutReply targetState="/StopSession"/>
+        <q>да хочу</q>
+        <a state="/GetCity"/>
+        <timeoutReply targetState="/StopSession"/>
+    </test-case>
+    
+    <test-case id="Проверка стейта Bye">
+        <dateTime>2025-10-05 15:30:00\\</dateTime>
+        <q>Какой прогноз  в Москве</q>
+        <a state="/GetDate"/>
+        <timeoutReply targetState="/StopSession"/>
+        <q>пока</q>
+        <a state="/Goodbye"/>
+        <a state="/StopSession"/>
+        
+    </test-case>
     
 </test>    
