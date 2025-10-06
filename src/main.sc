@@ -138,8 +138,6 @@ theme: /
     
     state: CheckDate
         if: checkDate($session.date).past
-            script:
-                log("ALARM"+$session.date)
             go!: /ThisDayHasPassed
         elseif: checkDate($session.date).away
             go!: /ThisDayIsNotComingSoon
